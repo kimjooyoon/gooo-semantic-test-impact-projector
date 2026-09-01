@@ -33,7 +33,7 @@ func Compile(sourcePath, contractPath, outputIR, outputGo string) error {
 		return fmt.Errorf("generator requires the fixed nine-case contract")
 	}
 	ir := SemanticIR{
-		Schema: "gooo/semantic-test-impact-projector/semantic-ir/v1",
+		Schema:     "gooo/semantic-test-impact-projector/semantic-ir/v1",
 		SourcePath: filepath.ToSlash(sourcePath), SourceDigest: meta.SourceDigest,
 		ContractPath: filepath.ToSlash(contractPath), ContractDigest: DigestBytes(contractRaw),
 		Toolchain: ToolchainVersion, Meta: meta,
@@ -49,7 +49,7 @@ func Compile(sourcePath, contractPath, outputIR, outputGo string) error {
 		ContractDigest string   `json:"contract_digest"`
 		Activities     []string `json:"activities"`
 	}{
-		Schema: "gooo/semantic-test-impact-projector/generated-binding/v1",
+		Schema:       "gooo/semantic-test-impact-projector/generated-binding/v1",
 		SourceDigest: meta.SourceDigest, ContractDigest: DigestBytes(contractRaw),
 		Activities: append([]string(nil), RequiredActivities...),
 	}

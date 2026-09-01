@@ -14,7 +14,7 @@ func ParseMeta(path string) (MetaDeclaration, error) {
 		return MetaDeclaration{}, err
 	}
 	meta := MetaDeclaration{
-		Schema: "gooo/semantic-test-impact-projector/meta/v1",
+		Schema:     "gooo/semantic-test-impact-projector/meta/v1",
 		Precedence: []string{}, ReceiptFields: []string{}, FallbackPolicies: []string{},
 		Activities: []string{}, ForbiddenEffects: []string{}, SourcePath: path, SourceDigest: DigestBytes(data),
 	}

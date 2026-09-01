@@ -5,8 +5,8 @@ const (
 	DecisionUnknown = "UNKNOWN"
 	DecisionRefuted = "REFUTED"
 
-	ActionReuse       = "REUSED"
-	ActionProject     = "PROJECTED"
+	ActionReuse        = "REUSED"
+	ActionProject      = "PROJECTED"
 	ActionFullFallback = "FULL_FALLBACK"
 
 	FallbackDecision = DecisionClosed
@@ -70,53 +70,53 @@ type TestObligation struct {
 }
 
 type ProofReceipt struct {
-	Schema           string `json:"schema"`
-	ObligationID     string `json:"obligation_id"`
-	State            string `json:"state"`
-	Immutable        bool   `json:"immutable"`
+	Schema             string `json:"schema"`
+	ObligationID       string `json:"obligation_id"`
+	State              string `json:"state"`
+	Immutable          bool   `json:"immutable"`
 	SemanticRootDigest string `json:"semantic_root_digest"`
-	DependencyDigest string `json:"dependency_digest"`
-	ContractDigest   string `json:"contract_digest"`
-	FixtureDigest    string `json:"fixture_digest"`
-	ToolchainDigest  string `json:"toolchain_digest"`
-	RunnerDigest     string `json:"runner_digest"`
-	ResultDigest     string `json:"result_digest"`
+	DependencyDigest   string `json:"dependency_digest"`
+	ContractDigest     string `json:"contract_digest"`
+	FixtureDigest      string `json:"fixture_digest"`
+	ToolchainDigest    string `json:"toolchain_digest"`
+	RunnerDigest       string `json:"runner_digest"`
+	ResultDigest       string `json:"result_digest"`
 }
 
 type RuntimeAuthority struct {
-	RepositoryWrites         int `json:"repository_writes"`
-	LocalTestExecutions      int `json:"local_test_executions"`
+	RepositoryWrites          int `json:"repository_writes"`
+	LocalTestExecutions       int `json:"local_test_executions"`
 	CrossProjectRequiredGates int `json:"cross_project_required_gates"`
 }
 
 type OperatorAuthority struct {
-	PullRequest       int `json:"pull_request"`
-	Merge             int `json:"merge"`
-	Tag               int `json:"tag"`
-	Release           int `json:"release"`
+	PullRequest int `json:"pull_request"`
+	Merge       int `json:"merge"`
+	Tag         int `json:"tag"`
+	Release     int `json:"release"`
 }
 
 type Fixture struct {
-	Schema          string            `json:"schema"`
-	CaseID          string            `json:"case_id"`
-	Description     string            `json:"description"`
-	Kind            string            `json:"kind"`
-	Before          ReleasedGraph     `json:"before"`
-	Candidate       ReleasedGraph     `json:"candidate"`
-	Obligations     []TestObligation  `json:"obligations"`
-	ParentProofs    []ProofReceipt    `json:"parent_proofs"`
+	Schema           string           `json:"schema"`
+	CaseID           string           `json:"case_id"`
+	Description      string           `json:"description"`
+	Kind             string           `json:"kind"`
+	Before           ReleasedGraph    `json:"before"`
+	Candidate        ReleasedGraph    `json:"candidate"`
+	Obligations      []TestObligation `json:"obligations"`
+	ParentProofs     []ProofReceipt   `json:"parent_proofs"`
 	RuntimeAuthority RuntimeAuthority `json:"runtime_authority"`
-	Expected        Expected          `json:"expected"`
+	Expected         Expected         `json:"expected"`
 }
 
 type Expected struct {
-	Decision       string `json:"decision"`
-	Fallback       string `json:"fallback"`
-	Selected       int    `json:"selected"`
-	Executed       int    `json:"executed"`
-	Reused         int    `json:"reused"`
-	UnknownClass   string `json:"unknown_class,omitempty"`
-	RefutedReason  string `json:"refuted_reason,omitempty"`
+	Decision      string `json:"decision"`
+	Fallback      string `json:"fallback"`
+	Selected      int    `json:"selected"`
+	Executed      int    `json:"executed"`
+	Reused        int    `json:"reused"`
+	UnknownClass  string `json:"unknown_class,omitempty"`
+	RefutedReason string `json:"refuted_reason,omitempty"`
 }
 
 type ContractCase struct {
@@ -136,21 +136,21 @@ type Contract struct {
 }
 
 type MetaDeclaration struct {
-	Schema          string   `json:"schema"`
-	Program         string   `json:"program"`
-	Namespace       string   `json:"namespace"`
-	Precedence      []string `json:"precedence"`
-	ReceiptSchema   string   `json:"receipt_schema"`
-	ReceiptPolicy   string   `json:"receipt_policy"`
-	ReceiptFields   []string `json:"receipt_fields"`
-	TestObligation  string   `json:"test_obligation"`
-	DependencyEdge  string   `json:"semantic_dependency_edge"`
-	ProofReceipt    string   `json:"proof_receipt"`
+	Schema           string   `json:"schema"`
+	Program          string   `json:"program"`
+	Namespace        string   `json:"namespace"`
+	Precedence       []string `json:"precedence"`
+	ReceiptSchema    string   `json:"receipt_schema"`
+	ReceiptPolicy    string   `json:"receipt_policy"`
+	ReceiptFields    []string `json:"receipt_fields"`
+	TestObligation   string   `json:"test_obligation"`
+	DependencyEdge   string   `json:"semantic_dependency_edge"`
+	ProofReceipt     string   `json:"proof_receipt"`
 	FallbackPolicies []string `json:"fallback_policies"`
-	Activities      []string `json:"activities"`
+	Activities       []string `json:"activities"`
 	ForbiddenEffects []string `json:"forbidden_effects"`
-	SourcePath      string   `json:"source_path"`
-	SourceDigest    string   `json:"source_digest"`
+	SourcePath       string   `json:"source_path"`
+	SourceDigest     string   `json:"source_digest"`
 }
 
 type SemanticIR struct {
@@ -193,23 +193,23 @@ type TestMetrics struct {
 }
 
 type ExecutionObservation struct {
-	Total    int `json:"total"`
-	Selected int `json:"selected"`
-	Executed int `json:"executed"`
-	Reused   int `json:"reused"`
-	WallMS   int `json:"wall_ms"`
+	Total      int `json:"total"`
+	Selected   int `json:"selected"`
+	Executed   int `json:"executed"`
+	Reused     int `json:"reused"`
+	WallMS     int `json:"wall_ms"`
 	PeakRSSKiB int `json:"peak_rss_kib"`
 }
 
 type MatchedPair struct {
-	ScenarioID             string                `json:"scenario_id"`
+	ScenarioID             string               `json:"scenario_id"`
 	FullBaseline           ExecutionObservation `json:"full_baseline"`
 	ProjectedCandidate     ExecutionObservation `json:"projected_candidate"`
-	SemanticResultDigest   string                `json:"semantic_result_digest"`
-	FullReceiptDigest      string                `json:"full_receipt_digest"`
-	ProjectedReceiptDigest string                `json:"projected_receipt_digest"`
-	SemanticResultsEqual   bool                  `json:"semantic_results_equal"`
-	ReceiptsExactEqual    bool                  `json:"receipts_exact_equal"`
+	SemanticResultDigest   string               `json:"semantic_result_digest"`
+	FullReceiptDigest      string               `json:"full_receipt_digest"`
+	ProjectedReceiptDigest string               `json:"projected_receipt_digest"`
+	SemanticResultsEqual   bool                 `json:"semantic_results_equal"`
+	ReceiptsExactEqual     bool                 `json:"receipts_exact_equal"`
 }
 
 type CausalClosure struct {
@@ -234,23 +234,23 @@ type SemanticResult struct {
 }
 
 type ProjectionReceipt struct {
-	Schema             string                `json:"schema"`
-	CaseID             string                `json:"case_id"`
-	Decision           string                `json:"decision"`
-	FallbackDecision   string                `json:"fallback_decision"`
-	ExecutionMode     string                `json:"execution_mode"`
-	TestMetrics       TestMetrics           `json:"test_metrics"`
-	CausalClosure     CausalClosure         `json:"causal_closure"`
-	Plans             []ObligationPlan      `json:"plans"`
-	SemanticResult    SemanticResult        `json:"semantic_result"`
-	ParentProofDigest string                `json:"parent_proof_digest"`
-	Unknown           *Unknown              `json:"unknown,omitempty"`
-	Refuted          []Refutation           `json:"refuted,omitempty"`
-	RuntimeAuthority RuntimeAuthority       `json:"runtime_authority"`
-	RequestedAuthority RuntimeAuthority     `json:"requested_authority"`
-	OperatorAuthority OperatorAuthority     `json:"operator_authority"`
-	WallMS           int                   `json:"wall_ms"`
-	PeakRSSKiB       int                   `json:"peak_rss_kib"`
+	Schema              string            `json:"schema"`
+	CaseID              string            `json:"case_id"`
+	Decision            string            `json:"decision"`
+	FallbackDecision    string            `json:"fallback_decision"`
+	ExecutionMode       string            `json:"execution_mode"`
+	TestMetrics         TestMetrics       `json:"test_metrics"`
+	CausalClosure       CausalClosure     `json:"causal_closure"`
+	Plans               []ObligationPlan  `json:"plans"`
+	SemanticResult      SemanticResult    `json:"semantic_result"`
+	ParentProofDigest   string            `json:"parent_proof_digest"`
+	Unknown             *Unknown          `json:"unknown,omitempty"`
+	Refuted             []Refutation      `json:"refuted,omitempty"`
+	RuntimeAuthority    RuntimeAuthority  `json:"runtime_authority"`
+	RequestedAuthority  RuntimeAuthority  `json:"requested_authority"`
+	OperatorAuthority   OperatorAuthority `json:"operator_authority"`
+	WallMS              int               `json:"wall_ms"`
+	PeakRSSKiB          int               `json:"peak_rss_kib"`
 }
 
 type ScenarioResult struct {
@@ -269,36 +269,36 @@ type DenominatorVector struct {
 }
 
 type SuiteCase struct {
-	Ordinal    int      `json:"ordinal"`
-	CaseID     string   `json:"case_id"`
-	Kind       string   `json:"kind"`
-	Expected   string   `json:"expected"`
-	Decision   string   `json:"decision"`
-	Fallback   string   `json:"fallback"`
-	Match      bool     `json:"match"`
-	Reason     string   `json:"reason"`
-	Selected   int      `json:"selected"`
-	Executed   int      `json:"executed"`
-	Reused     int      `json:"reused"`
-	ReportPath string   `json:"report_path"`
+	Ordinal    int    `json:"ordinal"`
+	CaseID     string `json:"case_id"`
+	Kind       string `json:"kind"`
+	Expected   string `json:"expected"`
+	Decision   string `json:"decision"`
+	Fallback   string `json:"fallback"`
+	Match      bool   `json:"match"`
+	Reason     string `json:"reason"`
+	Selected   int    `json:"selected"`
+	Executed   int    `json:"executed"`
+	Reused     int    `json:"reused"`
+	ReportPath string `json:"report_path"`
 }
 
 type SuiteReport struct {
-	Schema          string             `json:"schema"`
-	Decision        string             `json:"decision"`
-	Contract        string             `json:"contract"`
-	ContractDigest  string             `json:"contract_digest"`
-	Denominator     DenominatorVector  `json:"denominator"`
-	Cases           []SuiteCase        `json:"cases"`
-	Metrics         TestMetrics        `json:"metrics"`
-	MatchedPair     MatchedPair        `json:"matched_pair"`
-	Indicators      []IndicatorObservation `json:"indicators"`
-	RuntimeAuthority RuntimeAuthority  `json:"runtime_authority"`
-	OperatorAuthority OperatorAuthority `json:"operator_authority"`
-	Inventory       Inventory          `json:"inventory"`
-	Utility         UtilityObservation `json:"utility"`
-	SharedLedger    SharedLedgerObservation `json:"shared_ledger"`
-	OperationalAudit OperationalAudit  `json:"operational_audit"`
+	Schema             string                  `json:"schema"`
+	Decision           string                  `json:"decision"`
+	Contract           string                  `json:"contract"`
+	ContractDigest     string                  `json:"contract_digest"`
+	Denominator        DenominatorVector       `json:"denominator"`
+	Cases              []SuiteCase             `json:"cases"`
+	Metrics            TestMetrics             `json:"metrics"`
+	MatchedPair        MatchedPair             `json:"matched_pair"`
+	Indicators         []IndicatorObservation  `json:"indicators"`
+	RuntimeAuthority   RuntimeAuthority        `json:"runtime_authority"`
+	OperatorAuthority  OperatorAuthority       `json:"operator_authority"`
+	Inventory          Inventory               `json:"inventory"`
+	Utility            UtilityObservation      `json:"utility"`
+	SharedLedger       SharedLedgerObservation `json:"shared_ledger"`
+	OperationalAudit   OperationalAudit        `json:"operational_audit"`
 }
 
 type IndicatorObservation struct {
@@ -350,10 +350,10 @@ type OperationalAudit struct {
 }
 
 type Options struct {
-	MetaPath     string
-	ContractPath string
-	CasesDir     string
-	OutputDir    string
-	Root         string
+	MetaPath           string
+	ContractPath       string
+	CasesDir           string
+	OutputDir          string
+	Root               string
 	SharedLedgerDigest string
 }

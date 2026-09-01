@@ -107,9 +107,9 @@ func conformance(args []string) {
 	printJSON(struct {
 		Decision    string `json:"decision"`
 		Denominator int    `json:"denominator"`
-		Normal     int    `json:"normal"`
-		Unknown    int    `json:"unknown"`
-		Refuted    int    `json:"refuted"`
+		Normal      int    `json:"normal"`
+		Unknown     int    `json:"unknown"`
+		Refuted     int    `json:"refuted"`
 	}{report.Decision, report.Denominator.Total, report.Denominator.Normal, report.Denominator.Unknown, report.Denominator.Refuted})
 	if report.Decision != projector.DecisionClosed {
 		os.Exit(1)

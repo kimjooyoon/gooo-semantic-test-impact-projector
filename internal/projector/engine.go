@@ -22,8 +22,8 @@ type graphCheck struct {
 }
 
 type proofCheck struct {
-	Unknowns   []Unknown
-	ProofByID  map[string]ProofReceipt
+	Unknowns    []Unknown
+	ProofByID   map[string]ProofReceipt
 	ProofDigest string
 }
 
@@ -564,7 +564,7 @@ func RunSuite(options Options) (SuiteReport, error) {
 		suiteCases = append(suiteCases, SuiteCase{
 			Ordinal: index + 1, CaseID: item.ID, Kind: item.Kind, Expected: item.Expected,
 			Decision: result.Decision, Fallback: result.Receipt.FallbackDecision,
-			Match: match,
+			Match:  match,
 			Reason: reason, Selected: result.Receipt.TestMetrics.Selected, Executed: result.Receipt.TestMetrics.Executed,
 			Reused: result.Receipt.TestMetrics.Reused, ReportPath: filepath.ToSlash(filepath.Join("cases", item.ID, "human-report.md")),
 		})
