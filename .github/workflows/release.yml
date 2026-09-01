@@ -1,0 +1,105 @@
+name: Immutable semantic test impact projector release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version without the v prefix, for example 0.1.0
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      CROSS_PROJECT_REQUIRED_GATES: "0"
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+      - name: Set up Go 1.27
+        uses: actions/setup-go@v6
+        with:
+          go-version: 1.27.0
+          cache: false
+      - name: Verify main and toolchain
+        run: |
+          test "${GITHUB_REF_NAME}" = "main"
+          test "$(go env GOVERSION)" = "go1.27.0"
+      - name: Verify formatting and vet
+        shell: bash
+        run: |
+          set -euo pipefail
+          files=$(gofmt -l $(git ls-files '*.go'))
+          if test -n "$files"; then
+            gofmt -d $files
+          fi
+          test -z "$files"
+          go vet ./...
+      - name: Build evaluator
+        run: go build -trimpath -o "$RUNNER_TEMP/gooo-semantic-test-impact-projector-bin" ./cmd/gooo-semantic-test-impact-projector
+      - name: Run tests and conformance
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test ./...
+          CONFORMANCE_WORK_ROOT="$RUNNER_TEMP/conformance-work" CONFORMANCE_COUNTS_OUT="$RUNNER_TEMP/conformance-counts.json" REUSE_PAIR_OUT="$RUNNER_TEMP/reuse-pair.json" scripts/conformance.sh "$RUNNER_TEMP/gooo-semantic-test-impact-projector-bin"
+          INTEGRATION_RESULT_OUT="$RUNNER_TEMP/integration-result.json" scripts/integration.sh "$RUNNER_TEMP/gooo-semantic-test-impact-projector-bin"
+      - name: Create evidence bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          bundle="$RUNNER_TEMP/gooo-semantic-test-impact-projector-evidence"
+          mkdir -p "$bundle"
+          cp "$RUNNER_TEMP/gooo-semantic-test-impact-projector-bin" "$bundle/gooo-semantic-test-impact-projector"
+          cp "$RUNNER_TEMP/conformance-work/suite-report.json" "$bundle/suite-report.json"
+          cp "$RUNNER_TEMP/conformance-work/human-report.md" "$bundle/human-report.md"
+          cp contracts/denominator-v1.json "$bundle/denominator-v1.json"
+          cp .gooo/semantic-test-impact-projector.gooo "$bundle/semantic-test-impact-projector.gooo"
+          jq -n --arg version "${{ inputs.version }}" --arg commit "$GITHUB_SHA" --arg toolchain "go1.27.0" --arg runner "ubuntu-latest" '{schema:"gooo/semantic-test-impact-projector/release-evidence/v1",version:$version,commit:$commit,toolchain:$toolchain,runner:$runner,cross_project_required_gates:0,runtime_authority:{repository_writes:0,local_test_executions:0,cross_project_required_gates:0},operator_authority:{pull_request:1,merge:1,tag:1,release:1},operational_audit:{state:"NOT_RUN",exact_count:0,stage:"LOCAL_VALIDATION",step:"NO_LOCAL_VALIDATION_EXECUTED",reason:"GITHUB_ACTIONS_IS_THE_VALIDATION_AUTHORITY"}}' > "$bundle/release-manifest.json"
+          tar -czf "$RUNNER_TEMP/gooo-semantic-test-impact-projector-evidence.tar.gz" -C "$bundle" .
+          sha256sum "$RUNNER_TEMP/gooo-semantic-test-impact-projector-evidence.tar.gz" > "$RUNNER_TEMP/release-asset.sha256"
+      - name: Create annotated tag once
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="v${{ inputs.version }}"
+          if git show-ref --verify --quiet "refs/tags/$tag"; then
+            echo "existing release tag must not be modified: $tag" >&2
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$tag" "$GITHUB_SHA" -m "gooo-semantic-test-impact-projector $tag"
+          git push origin "$tag"
+      - name: Create draft release
+        shell: bash
+        run: gh release create "v${{ inputs.version }}" --draft --title "v${{ inputs.version }}" --notes "Semantic test impact projector release v${{ inputs.version }}."
+      - name: Upload evidence before publish
+        run: gh release upload "v${{ inputs.version }}" "$RUNNER_TEMP/gooo-semantic-test-impact-projector-evidence.tar.gz"
+      - name: Publish release once
+        run: gh release edit "v${{ inputs.version }}" --draft=false
+      - name: Verify immutable release and digests through API
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="v${{ inputs.version }}"
+          release=$(gh api --header 'X-GitHub-Api-Version: 2026-03-10' "repos/$GITHUB_REPOSITORY/releases/tags/$tag")
+          test "$(jq -er '.immutable' <<<"$release")" = true
+          test "$(jq -er '.assets | length' <<<"$release")" = 1
+          jq -e 'all(.assets[]; (.digest | type == "string" and startswith("sha256:")))' <<<"$release" >/dev/null
+          expected="sha256:$(awk '{print $1}' "$RUNNER_TEMP/release-asset.sha256")"
+          actual=$(jq -er --arg name "gooo-semantic-test-impact-projector-evidence.tar.gz" '.assets[] | select(.name == $name) | .digest' <<<"$release")
+          test "$actual" = "$expected"
+          ref=$(gh api --header 'X-GitHub-Api-Version: 2026-03-10' "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag")
+          test "$(jq -er '.object.type' <<<"$ref")" = tag
+          tag_object=$(jq -er '.object.sha' <<<"$ref")
+          tag_data=$(gh api --header 'X-GitHub-Api-Version: 2026-03-10' "repos/$GITHUB_REPOSITORY/git/tags/$tag_object")
+          test "$(jq -er '.object.type' <<<"$tag_data")" = commit
+          test "$(jq -er '.object.sha' <<<"$tag_data")" = "$GITHUB_SHA"

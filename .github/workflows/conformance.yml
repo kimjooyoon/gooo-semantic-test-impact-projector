@@ -1,0 +1,71 @@
+name: Semantic test impact projector conformance
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  conformance:
+    runs-on: ubuntu-latest
+    env:
+      SUBJECT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      CROSS_PROJECT_REQUIRED_GATES: "0"
+    steps:
+      - name: Checkout subject
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SUBJECT_SHA }}
+      - name: Set up Go 1.27
+        uses: actions/setup-go@v6
+        with:
+          go-version: 1.27.0
+          cache: false
+      - name: Verify toolchain
+        run: test "$(go env GOVERSION)" = "go1.27.0"
+      - name: Verify formatting
+        shell: bash
+        run: |
+          set -euo pipefail
+          files=$(gofmt -l $(git ls-files '*.go'))
+          if test -n "$files"; then
+            gofmt -d $files
+          fi
+          test -z "$files"
+      - name: Verify vet
+        run: go vet ./...
+      - name: Compile semantic IR and generated evaluator
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/generated"
+          go run ./cmd/gooo-semantic-test-impact-projector compile \
+            --source .gooo/semantic-test-impact-projector.gooo \
+            --contract contracts/denominator-v1.json \
+            --output-ir "$RUNNER_TEMP/generated/semantic-ir.json" \
+            --output-go "$RUNNER_TEMP/generated/semantic.gooo.go"
+          test -s "$RUNNER_TEMP/generated/semantic-ir.json"
+          test -s "$RUNNER_TEMP/generated/semantic.gooo.go"
+      - name: Run Go tests and record test events
+        shell: bash
+        run: scripts/measure-stage.sh test "$RUNNER_TEMP/stage-metrics/test.json" bash -c 'set -o pipefail; go test -json ./... | tee "$RUNNER_TEMP/go-test-events.jsonl"'
+      - name: Build evaluator binary
+        run: go build -trimpath -o "$RUNNER_TEMP/gooo-semantic-test-impact-projector-bin" ./cmd/gooo-semantic-test-impact-projector
+      - name: Run fixed nine-case denominator and matched pair
+        shell: bash
+        run: CONFORMANCE_WORK_ROOT="$RUNNER_TEMP/conformance-work" CONFORMANCE_COUNTS_OUT="$RUNNER_TEMP/conformance-counts.json" REUSE_PAIR_OUT="$RUNNER_TEMP/reuse-pair.json" scripts/measure-stage.sh conformance "$RUNNER_TEMP/stage-metrics/conformance.json" scripts/conformance.sh "$RUNNER_TEMP/gooo-semantic-test-impact-projector-bin"
+      - name: Run caller-owned integration
+        shell: bash
+        run: INTEGRATION_RESULT_OUT="$RUNNER_TEMP/integration-result.json" scripts/measure-stage.sh integration "$RUNNER_TEMP/stage-metrics/integration.json" scripts/integration.sh "$RUNNER_TEMP/gooo-semantic-test-impact-projector-bin"
+      - name: Assemble machine evidence
+        run: scripts/assemble-ci-evidence.sh "$RUNNER_TEMP/stage-metrics" "$RUNNER_TEMP/go-test-events.jsonl" "$RUNNER_TEMP/conformance-counts.json" "$RUNNER_TEMP/reuse-pair.json" "$RUNNER_TEMP/integration-result.json" "$RUNNER_TEMP/ci-evidence.json"
+      - name: Upload machine evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: gooo-semantic-test-impact-projector-ci-evidence-${{ github.sha }}
+          path: ${{ runner.temp }}/ci-evidence.json
+          if-no-files-found: error
