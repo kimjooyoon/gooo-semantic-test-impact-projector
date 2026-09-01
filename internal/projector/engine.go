@@ -48,7 +48,6 @@ func Project(fixture Fixture, meta MetaDeclaration) (ScenarioResult, error) {
 	beforeCheck := validateGraph(fixture.Before, "BEFORE")
 	candidateCheck := validateGraph(fixture.Candidate, "CANDIDATE")
 	decision := DecisionClosed
-	reason := "EXACT_PARENT_PROOF_AND_CAUSAL_CLOSURE"
 	unknowns := []Unknown{}
 	refutations := append([]Refutation{}, beforeCheck.Refutations...)
 	refutations = append(refutations, candidateCheck.Refutations...)
@@ -63,10 +62,8 @@ func Project(fixture Fixture, meta MetaDeclaration) (ScenarioResult, error) {
 	unknowns = append(unknowns, proofs.Unknowns...)
 	if len(refutations) > 0 {
 		decision = DecisionRefuted
-		reason = refutations[0].Reason
 	} else if len(unknowns) > 0 {
 		decision = DecisionUnknown
-		reason = unknowns[0].Reason
 	}
 
 	plans := make([]ObligationPlan, 0, len(fixture.Obligations))

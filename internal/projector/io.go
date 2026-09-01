@@ -135,24 +135,6 @@ func findRepositoryRoot() string {
 	}
 }
 
-func loadContract(path string) (Contract, string, error) {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return Contract{}, "", err
-	}
-	var contract Contract
-	if err := json.Unmarshal(data, &contract); err != nil {
-		return Contract{}, "", fmt.Errorf("decode contract: %w", err)
-	}
-	if !contract.Fixed || len(contract.Cases) != 9 || len(contract.Precedence) != 3 {
-		return Contract{}, "", fmt.Errorf("contract must be fixed with exactly nine cases and three precedence states")
-	}
-	if contract.Precedence[0] != DecisionRefuted || contract.Precedence[1] != DecisionUnknown || contract.Precedence[2] != DecisionClosed {
-		return Contract{}, "", fmt.Errorf("contract precedence must be REFUTED > UNKNOWN > CLOSED")
-	}
-	return contract, DigestBytes(data), nil
-}
-
 func BuildInventory(root string) (Inventory, error) {
 	inventory := Inventory{RootREADMEExcluded: true}
 	err := filepath.WalkDir(root, func(path string, entry os.DirEntry, walkErr error) error {
