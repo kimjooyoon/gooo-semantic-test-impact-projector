@@ -32,6 +32,12 @@ jobs:
         run: |
           test "${GITHUB_REF_NAME}" = "main"
           test "$(go env GOVERSION)" = "go1.27.0"
+      - name: Verify repository immutable-release enforcement
+        shell: bash
+        run: |
+          set -euo pipefail
+          setting=$(gh api --header 'X-GitHub-Api-Version: 2026-03-10' "repos/$GITHUB_REPOSITORY/immutable-releases")
+          test "$(jq -er '.enabled' <<<"$setting")" = true
       - name: Verify formatting and vet
         shell: bash
         run: |
