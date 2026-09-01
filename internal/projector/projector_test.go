@@ -41,6 +41,9 @@ func TestCanonicalProjectionCases(t *testing.T) {
 			if result.Decision != want.decision {
 				t.Fatalf("decision = %s, want %s", result.Decision, want.decision)
 			}
+			if want.decision == DecisionRefuted && result.Receipt.Unknown != nil {
+				t.Fatal("refuted receipt exposed a lower-precedence top-level UNKNOWN")
+			}
 			metrics := result.Receipt.TestMetrics
 			if metrics.Selected != want.selected || metrics.Executed != want.executed || metrics.Reused != want.reused {
 				t.Fatalf("metrics = %+v, want selected=%d executed=%d reused=%d", metrics, want.selected, want.executed, want.reused)

@@ -31,6 +31,7 @@ done
 
 for case in semantic-root-mismatch dependency-contradiction authority-escalation; do
   jq -e '.decision == "REFUTED" and .fallback_decision == "CLOSED" and (.refuted|length > 0)' "$work_root/cases/$case/projection-receipt.json" >/dev/null
+  jq -e '.unknown == null' "$work_root/cases/$case/projection-receipt.json" >/dev/null
   jq -e '.test_metrics.total == 5 and .test_metrics.selected == 5 and .test_metrics.executed == 5 and .test_metrics.reused == 0' "$work_root/cases/$case/projection-receipt.json" >/dev/null
 done
 
