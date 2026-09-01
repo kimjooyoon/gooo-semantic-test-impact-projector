@@ -125,7 +125,7 @@ func Project(fixture Fixture, meta MetaDeclaration) (ScenarioResult, error) {
 		RuntimeAuthority: RuntimeAuthority{}, RequestedAuthority: fixture.RuntimeAuthority,
 		OperatorAuthority: OperatorAuthority{}, WallMS: wallMS, PeakRSSKiB: peakRSS,
 	}
-	if len(unknowns) > 0 {
+	if decision == DecisionUnknown && len(unknowns) > 0 {
 		receipt.Unknown = &unknowns[0]
 	}
 	receipt.Refuted = refutations
@@ -544,10 +544,10 @@ func RunSuite(options Options) (SuiteReport, error) {
 			matched = result.Matched
 		}
 		reason := result.Decision
-		if result.Receipt.Unknown != nil {
-			reason = result.Receipt.Unknown.Reason
-		} else if len(result.Receipt.Refuted) > 0 {
+		if len(result.Receipt.Refuted) > 0 {
 			reason = result.Receipt.Refuted[0].Reason
+		} else if result.Receipt.Unknown != nil {
+			reason = result.Receipt.Unknown.Reason
 		}
 		match := result.Decision == item.Expected && result.Receipt.FallbackDecision == fixture.Expected.Fallback &&
 			result.Receipt.TestMetrics.Selected == fixture.Expected.Selected &&
