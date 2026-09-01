@@ -1,0 +1,18 @@
+{
+  "schema": "gooo/semantic-test-impact-projector/denominator/v1",
+  "id": "semantic-test-impact-projector-canonical-v1",
+  "version": "1",
+  "fixed": true,
+  "precedence": ["REFUTED", "UNKNOWN", "CLOSED"],
+  "cases": [
+    {"id": "unchanged-full-reuse", "source": "unchanged-full-reuse.json", "expected": "CLOSED", "kind": "normal"},
+    {"id": "one-node-closure", "source": "one-node-closure.json", "expected": "CLOSED", "kind": "normal"},
+    {"id": "independent-branch", "source": "independent-branch.json", "expected": "CLOSED", "kind": "normal"},
+    {"id": "missing-parent-proof", "source": "missing-parent-proof.json", "expected": "UNKNOWN", "kind": "unknown"},
+    {"id": "stale-parent-proof", "source": "stale-parent-proof.json", "expected": "UNKNOWN", "kind": "unknown"},
+    {"id": "ambiguous-parent-proof", "source": "ambiguous-parent-proof.json", "expected": "UNKNOWN", "kind": "unknown"},
+    {"id": "semantic-root-mismatch", "source": "semantic-root-mismatch.json", "expected": "REFUTED", "kind": "refuted"},
+    {"id": "dependency-contradiction", "source": "dependency-contradiction.json", "expected": "REFUTED", "kind": "refuted"},
+    {"id": "authority-escalation", "source": "authority-escalation.json", "expected": "REFUTED", "kind": "refuted"}
+  ]
+}

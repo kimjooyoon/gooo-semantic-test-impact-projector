@@ -1,0 +1,9 @@
+program semantic-test-impact-projector-example
+namespace gooo.example.semantic.test.impact
+claim example-source "semantic source is released"
+claim example-proof "proof receipt is immutable"
+semantic_dependency_edge example-source -> example-proof relation=causal
+test_obligation example-test contract_digest=example fixture_digest=example semantic_nodes=example-proof terminal=PASS
+proof_receipt state=PASS immutable=true parent=required
+fallback_policy unknown=MISSING_PARENT_PROOF,STALE_PARENT_PROOF,AMBIGUOUS_PARENT_PROOF action=FULL_FALLBACK decision=CLOSED
+activity project-test-plan

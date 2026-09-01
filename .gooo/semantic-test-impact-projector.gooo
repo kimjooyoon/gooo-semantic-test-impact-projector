@@ -1,0 +1,33 @@
+program semantic-test-impact-projector
+namespace gooo.semantic.test.impact
+precedence REFUTED > UNKNOWN > CLOSED
+receipt_schema gooo/semantic-test-impact-projector/proof-receipt/v1
+receipt_policy immutable-pass-only
+receipt_field obligation_id
+receipt_field semantic_root_digest
+receipt_field dependency_digest
+receipt_field contract_digest
+receipt_field fixture_digest
+receipt_field toolchain_digest
+receipt_field runner_digest
+receipt_field result_digest
+test_obligation obligation_id=stable-test-unit contract_digest=contract fixture_digest=fixture semantic_nodes=claim:* terminal=PASS
+semantic_dependency_edge from=claim:* to=claim:* relation=causal from_digest=semantic_digest to_digest=semantic_digest
+proof_receipt state=PASS immutable=true parent=required
+fallback_policy unknown=MISSING_PARENT_PROOF,STALE_PARENT_PROOF,AMBIGUOUS_PARENT_PROOF action=FULL_FALLBACK decision=CLOSED
+fallback_policy refuted=SEMANTIC_ROOT_MISMATCH,DEPENDENCY_CONTRADICTION,AUTHORITY_ESCALATION action=FULL_FALLBACK decision=CLOSED
+activity parse-gooo
+activity build-semantic-ir
+activity bind-released-claims
+activity verify-parent-proof
+activity compute-causal-closure
+activity project-test-plan
+activity execute-full-fallback
+activity compare-matched-pair
+activity render-human-report
+forbid_effect repository_write
+forbid_effect local_test_execution
+forbid_effect commit
+forbid_effect push
+forbid_effect merge
+forbid_effect release
