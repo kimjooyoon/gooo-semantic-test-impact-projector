@@ -11,6 +11,10 @@ plus the tag object, target commit, asset count, and asset digest using the
 GitHub API. Existing public artifacts are never deleted, overwritten, or
 recreated.
 
+The repository immutable-releases setting must be enabled by an administrator
+before dispatch. The release workflow itself uses only `github.token`; the
+final public release object is the acceptance authority.
+
 The final audit reports the pull-request URL, merge SHA, final CI runs/jobs/
 artifacts, release ID, tag object and target, release assets and digests, the
 `[9,3,3,3]` denominator vector, runtime and inventory records, and the exact
