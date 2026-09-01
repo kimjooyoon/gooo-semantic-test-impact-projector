@@ -234,23 +234,23 @@ type SemanticResult struct {
 }
 
 type ProjectionReceipt struct {
-	Schema              string            `json:"schema"`
-	CaseID              string            `json:"case_id"`
-	Decision            string            `json:"decision"`
-	FallbackDecision    string            `json:"fallback_decision"`
-	ExecutionMode       string            `json:"execution_mode"`
-	TestMetrics         TestMetrics       `json:"test_metrics"`
-	CausalClosure       CausalClosure     `json:"causal_closure"`
-	Plans               []ObligationPlan  `json:"plans"`
-	SemanticResult      SemanticResult    `json:"semantic_result"`
-	ParentProofDigest   string            `json:"parent_proof_digest"`
-	Unknown             *Unknown          `json:"unknown,omitempty"`
-	Refuted             []Refutation      `json:"refuted,omitempty"`
-	RuntimeAuthority    RuntimeAuthority  `json:"runtime_authority"`
-	RequestedAuthority  RuntimeAuthority  `json:"requested_authority"`
-	OperatorAuthority   OperatorAuthority `json:"operator_authority"`
-	WallMS              int               `json:"wall_ms"`
-	PeakRSSKiB          int               `json:"peak_rss_kib"`
+	Schema             string            `json:"schema"`
+	CaseID             string            `json:"case_id"`
+	Decision           string            `json:"decision"`
+	FallbackDecision   string            `json:"fallback_decision"`
+	ExecutionMode      string            `json:"execution_mode"`
+	TestMetrics        TestMetrics       `json:"test_metrics"`
+	CausalClosure      CausalClosure     `json:"causal_closure"`
+	Plans              []ObligationPlan  `json:"plans"`
+	SemanticResult     SemanticResult    `json:"semantic_result"`
+	ParentProofDigest  string            `json:"parent_proof_digest"`
+	Unknown            *Unknown          `json:"unknown,omitempty"`
+	Refuted            []Refutation      `json:"refuted,omitempty"`
+	RuntimeAuthority   RuntimeAuthority  `json:"runtime_authority"`
+	RequestedAuthority RuntimeAuthority  `json:"requested_authority"`
+	OperatorAuthority  OperatorAuthority `json:"operator_authority"`
+	WallMS             int               `json:"wall_ms"`
+	PeakRSSKiB         int               `json:"peak_rss_kib"`
 }
 
 type ScenarioResult struct {
@@ -284,28 +284,28 @@ type SuiteCase struct {
 }
 
 type SuiteReport struct {
-	Schema             string                  `json:"schema"`
-	Decision           string                  `json:"decision"`
-	Contract           string                  `json:"contract"`
-	ContractDigest     string                  `json:"contract_digest"`
-	Denominator        DenominatorVector       `json:"denominator"`
-	Cases              []SuiteCase             `json:"cases"`
-	Metrics            TestMetrics             `json:"metrics"`
-	MatchedPair        MatchedPair             `json:"matched_pair"`
-	Indicators         []IndicatorObservation  `json:"indicators"`
-	RuntimeAuthority   RuntimeAuthority        `json:"runtime_authority"`
-	OperatorAuthority  OperatorAuthority       `json:"operator_authority"`
-	Inventory          Inventory               `json:"inventory"`
-	Utility            UtilityObservation      `json:"utility"`
-	SharedLedger       SharedLedgerObservation `json:"shared_ledger"`
-	OperationalAudit   OperationalAudit        `json:"operational_audit"`
+	Schema            string                  `json:"schema"`
+	Decision          string                  `json:"decision"`
+	Contract          string                  `json:"contract"`
+	ContractDigest    string                  `json:"contract_digest"`
+	Denominator       DenominatorVector       `json:"denominator"`
+	Cases             []SuiteCase             `json:"cases"`
+	Metrics           TestMetrics             `json:"metrics"`
+	MatchedPair       MatchedPair             `json:"matched_pair"`
+	Indicators        []IndicatorObservation  `json:"indicators"`
+	RuntimeAuthority  RuntimeAuthority        `json:"runtime_authority"`
+	OperatorAuthority OperatorAuthority       `json:"operator_authority"`
+	Inventory         Inventory               `json:"inventory"`
+	Utility           UtilityObservation      `json:"utility"`
+	SharedLedger      SharedLedgerObservation `json:"shared_ledger"`
+	OperationalAudit  OperationalAudit        `json:"operational_audit"`
 }
 
 type IndicatorObservation struct {
 	Name        string `json:"name"`
-	Before      int   `json:"before"`
-	After       int   `json:"after"`
-	SignedDelta int   `json:"signed_delta"`
+	Before      int    `json:"before"`
+	After       int    `json:"after"`
+	SignedDelta int    `json:"signed_delta"`
 	Direction   string `json:"direction"`
 	State       string `json:"state"`
 	Reason      string `json:"reason"`
