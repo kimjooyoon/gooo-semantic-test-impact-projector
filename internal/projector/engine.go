@@ -172,13 +172,29 @@ func validateGraph(graph ReleasedGraph, label string) graphCheck {
 	claims := append([]Claim(nil), graph.Claims...)
 	sort.Slice(claims, func(i, j int) bool { return claims[i].ID < claims[j].ID })
 	byID := map[string]Claim{}
+	seenClaimIDs := map[string]bool{}
+	refutations := []Refutation{}
 	for _, claim := range claims {
+		if claim.ID == "" || seenClaimIDs[claim.ID] {
+			refutations = append(refutations, Refutation{
+				Stage: "BIND_RELEASED_CLAIMS", Step: "VERIFY_CLAIM_IDENTITY", Reason: "DUPLICATE_OR_EMPTY_CLAIM_ID",
+				NextOperation: "RELEASE_UNIQUE_CLAIM_IDS", BlockedBy: []string{label + "_CLAIM_ID"},
+			})
+		}
+		seenClaimIDs[claim.ID] = true
 		byID[claim.ID] = claim
 	}
 	edges := append([]DependencyEdge(nil), graph.Edges...)
 	sort.Slice(edges, func(i, j int) bool { return edges[i].ID < edges[j].ID })
-	refutations := []Refutation{}
+	seenEdgeIDs := map[string]bool{}
 	for _, edge := range edges {
+		if edge.ID == "" || seenEdgeIDs[edge.ID] {
+			refutations = append(refutations, Refutation{
+				Stage: "BIND_RELEASED_CLAIMS", Step: "VERIFY_DEPENDENCY_EDGE_IDENTITY", Reason: "DUPLICATE_OR_EMPTY_DEPENDENCY_EDGE_ID",
+				NextOperation: "RELEASE_UNIQUE_DEPENDENCY_EDGE_IDS", BlockedBy: []string{label + "_EDGE_ID"},
+			})
+		}
+		seenEdgeIDs[edge.ID] = true
 		from, fromOK := byID[edge.From]
 		to, toOK := byID[edge.To]
 		if !fromOK || !toOK || (edge.FromDigest != "" && edge.FromDigest != "auto" && edge.FromDigest != from.SemanticDigest) ||

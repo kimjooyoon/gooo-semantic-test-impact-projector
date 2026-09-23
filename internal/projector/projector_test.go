@@ -95,3 +95,30 @@ func TestMatchedPairIsExact(t *testing.T) {
 		t.Fatal("matched pair total differs")
 	}
 }
+
+func TestValidateGraphRejectsDuplicateIdentifiers(t *testing.T) {
+	graph := ReleasedGraph{
+		Claims: []Claim{
+			{ID: "claim-a", Kind: "node", SemanticDigest: "sha256:a"},
+			{ID: "claim-a", Kind: "node", SemanticDigest: "sha256:b"},
+		},
+		Edges: []DependencyEdge{
+			{ID: "edge-a", From: "claim-a", To: "claim-a", Relation: "depends"},
+			{ID: "edge-a", From: "claim-a", To: "claim-a", Relation: "depends"},
+		},
+	}
+	check := validateGraph(graph, "CANDIDATE")
+	foundClaim := false
+	foundEdge := false
+	for _, refutation := range check.Refutations {
+		if refutation.Reason == "DUPLICATE_OR_EMPTY_CLAIM_ID" {
+			foundClaim = true
+		}
+		if refutation.Reason == "DUPLICATE_OR_EMPTY_DEPENDENCY_EDGE_ID" {
+			foundEdge = true
+		}
+	}
+	if !foundClaim || !foundEdge {
+		t.Fatalf("duplicate identifiers were not refuted: %+v", check.Refutations)
+	}
+}
