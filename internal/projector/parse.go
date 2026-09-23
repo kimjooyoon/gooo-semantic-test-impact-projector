@@ -18,6 +18,7 @@ func ParseMeta(path string) (MetaDeclaration, error) {
 		Precedence: []string{}, ReceiptFields: []string{}, FallbackPolicies: []string{},
 		Activities: []string{}, ForbiddenEffects: []string{}, SourcePath: path, SourceDigest: DigestBytes(data),
 	}
+	lineNumber := 0
 	seenScalar := map[string]bool{}
 	acceptScalar := func(key string) error {
 		if seenScalar[key] {
@@ -27,7 +28,6 @@ func ParseMeta(path string) (MetaDeclaration, error) {
 		return nil
 	}
 	scanner := bufio.NewScanner(strings.NewReader(string(data)))
-	lineNumber := 0
 	for scanner.Scan() {
 		lineNumber++
 		line := strings.TrimSpace(scanner.Text())
