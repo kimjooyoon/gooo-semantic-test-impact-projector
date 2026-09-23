@@ -61,11 +61,27 @@ func sortedStrings(values []string) []string {
 	return result
 }
 
-func resolvePath(root, value string) string {
-	if filepath.IsAbs(value) {
-		return filepath.Clean(value)
+func resolvePath(root, value string) (string, error) {
+	base, err := filepath.EvalSymlinks(root)
+	if err != nil {
+		return "", fmt.Errorf("resolve case root: %w", err)
 	}
-	return filepath.Clean(filepath.Join(root, value))
+	candidate := value
+	if !filepath.IsAbs(candidate) {
+		candidate = filepath.Join(base, candidate)
+	}
+	resolved, err := filepath.EvalSymlinks(candidate)
+	if err != nil {
+		return "", fmt.Errorf("resolve case path: %w", err)
+	}
+	relative, err := filepath.Rel(base, resolved)
+	if err != nil {
+		return "", fmt.Errorf("compare case path: %w", err)
+	}
+	if relative == ".." || strings.HasPrefix(relative, ".."+string(filepath.Separator)) || filepath.IsAbs(relative) {
+		return "", fmt.Errorf("case path escapes caller-owned case root")
+	}
+	return resolved, nil
 }
 
 func ensureOutputDir(path string) error {

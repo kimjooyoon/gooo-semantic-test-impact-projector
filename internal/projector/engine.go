@@ -505,7 +505,10 @@ func RunSuite(options Options) (SuiteReport, error) {
 	actualStates := map[string]int{DecisionClosed: 0, DecisionUnknown: 0, DecisionRefuted: 0}
 	var matched MatchedPair
 	for index, item := range contract.Cases {
-		path := resolvePath(options.CasesDir, item.Source)
+		path, err := resolvePath(options.CasesDir, item.Source)
+		if err != nil {
+			return SuiteReport{}, fmt.Errorf("case %s path: %w", item.ID, err)
+		}
 		fixture, err := LoadFixture(path)
 		if err != nil {
 			return SuiteReport{}, fmt.Errorf("case %s: %w", item.ID, err)

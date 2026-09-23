@@ -1,6 +1,7 @@
 package projector
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 )
@@ -93,5 +94,24 @@ func TestMatchedPairIsExact(t *testing.T) {
 	}
 	if result.Matched.FullBaseline.Total != result.Matched.ProjectedCandidate.Total {
 		t.Fatal("matched pair total differs")
+	}
+}
+
+func TestResolvePathRejectsOutsideCaseRoot(t *testing.T) {
+	root := t.TempDir()
+	outside := filepath.Join(filepath.Dir(root), "outside-fixture.json")
+	if err := os.WriteFile(outside, []byte("{}"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	defer os.Remove(outside)
+	if _, err := resolvePath(root, outside); err == nil {
+		t.Fatal("absolute case path outside root was accepted")
+	}
+	link := filepath.Join(root, "linked-fixture.json")
+	if err := os.Symlink(outside, link); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := resolvePath(root, link); err == nil {
+		t.Fatal("symlinked case path outside root was accepted")
 	}
 }
