@@ -56,6 +56,8 @@ func ParseMeta(path string) (MetaDeclaration, error) {
 			meta.Activities = append(meta.Activities, value)
 		case "forbid_effect":
 			meta.ForbiddenEffects = append(meta.ForbiddenEffects, value)
+		default:
+			return MetaDeclaration{}, fmt.Errorf("line %d: unsupported declaration %q", lineNumber, key)
 		}
 	}
 	if err := scanner.Err(); err != nil {

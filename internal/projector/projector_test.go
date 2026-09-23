@@ -1,6 +1,7 @@
 package projector
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 )
@@ -93,5 +94,15 @@ func TestMatchedPairIsExact(t *testing.T) {
 	}
 	if result.Matched.FullBaseline.Total != result.Matched.ProjectedCandidate.Total {
 		t.Fatal("matched pair total differs")
+	}
+}
+
+func TestParseMetaRejectsUnknownDeclaration(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "unknown.gooo")
+	if err := os.WriteFile(path, []byte("unknown_declaration value\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := ParseMeta(path); err == nil {
+		t.Fatal("unknown meta declaration was accepted")
 	}
 }
