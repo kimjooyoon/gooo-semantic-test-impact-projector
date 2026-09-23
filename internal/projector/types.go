@@ -173,8 +173,16 @@ type Unknown struct {
 }
 
 func (u Unknown) Valid() bool {
-	return u.Stage != "" && u.Step != "" && u.Reason != "" &&
-		u.UnknownClass != "" && u.NextOperation != "" && u.BlockedBy != nil
+	if u.Stage == "" || u.Step == "" || u.Reason == "" ||
+		u.UnknownClass == "" || u.NextOperation == "" || len(u.BlockedBy) == 0 {
+		return false
+	}
+	for _, blocker := range u.BlockedBy {
+		if blocker == "" {
+			return false
+		}
+	}
+	return true
 }
 
 type Refutation struct {
