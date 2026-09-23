@@ -1,6 +1,7 @@
 package projector
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 )
@@ -93,5 +94,15 @@ func TestMatchedPairIsExact(t *testing.T) {
 	}
 	if result.Matched.FullBaseline.Total != result.Matched.ProjectedCandidate.Total {
 		t.Fatal("matched pair total differs")
+	}
+}
+
+func TestParseMetaRejectsDuplicateScalarDeclaration(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "duplicate.gooo")
+	if err := os.WriteFile(path, []byte("program first\nprogram second\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := ParseMeta(path); err == nil {
+		t.Fatal("duplicate scalar meta declaration was accepted")
 	}
 }

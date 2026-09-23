@@ -18,6 +18,14 @@ func ParseMeta(path string) (MetaDeclaration, error) {
 		Precedence: []string{}, ReceiptFields: []string{}, FallbackPolicies: []string{},
 		Activities: []string{}, ForbiddenEffects: []string{}, SourcePath: path, SourceDigest: DigestBytes(data),
 	}
+	seenScalar := map[string]bool{}
+	acceptScalar := func(key string) error {
+		if seenScalar[key] {
+			return fmt.Errorf("line %d: duplicate declaration %q", lineNumber, key)
+		}
+		seenScalar[key] = true
+		return nil
+	}
 	scanner := bufio.NewScanner(strings.NewReader(string(data)))
 	lineNumber := 0
 	for scanner.Scan() {
@@ -33,22 +41,46 @@ func ParseMeta(path string) (MetaDeclaration, error) {
 		value = strings.TrimSpace(value)
 		switch key {
 		case "program":
+			if err := acceptScalar(key); err != nil {
+				return MetaDeclaration{}, err
+			}
 			meta.Program = value
 		case "namespace":
+			if err := acceptScalar(key); err != nil {
+				return MetaDeclaration{}, err
+			}
 			meta.Namespace = value
 		case "precedence":
+			if err := acceptScalar(key); err != nil {
+				return MetaDeclaration{}, err
+			}
 			meta.Precedence = strings.Fields(strings.ReplaceAll(value, ">", " "))
 		case "receipt_schema":
+			if err := acceptScalar(key); err != nil {
+				return MetaDeclaration{}, err
+			}
 			meta.ReceiptSchema = value
 		case "receipt_policy":
+			if err := acceptScalar(key); err != nil {
+				return MetaDeclaration{}, err
+			}
 			meta.ReceiptPolicy = value
 		case "receipt_field":
 			meta.ReceiptFields = append(meta.ReceiptFields, value)
 		case "test_obligation":
+			if err := acceptScalar(key); err != nil {
+				return MetaDeclaration{}, err
+			}
 			meta.TestObligation = value
 		case "semantic_dependency_edge":
+			if err := acceptScalar(key); err != nil {
+				return MetaDeclaration{}, err
+			}
 			meta.DependencyEdge = value
 		case "proof_receipt":
+			if err := acceptScalar(key); err != nil {
+				return MetaDeclaration{}, err
+			}
 			meta.ProofReceipt = value
 		case "fallback_policy":
 			meta.FallbackPolicies = append(meta.FallbackPolicies, value)
